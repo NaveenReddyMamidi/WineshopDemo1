@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<section>
+    <h2>{{ shop.name }}</h2>
+    <p>{{ shop.location }}</p>
+    <p><a href="{{ url_for('daily_stock', shop_id=shop.id) }}">Enter daily stock / sales</a></p>
+    <h3>Wine Prices</h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Wine</th>
+                    <th>Volume</th>
+                    <th>Description</th>
+                    <th>Price (₹)</th>
+                    {% if current_user.role == 'owner' %}<th>Update</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for price in prices %}
+                <tr>
+                    <td>{{ price.wine.name }}</td>
+                    <td>{% if price.wine.ml %}{{ price.wine.ml }} ml{% else %}—{% endif %}</td>
+                    <td>{{ price.wine.description }}</td>
+                    <td>{{ price.price|inr }}</td>
+                    {% if current_user.role == 'owner' %}
+                        <td>
+                            <form action="{{ url_for('update_price', shop_id=shop.id) }}" method="post" class="row">
+                                <input type="hidden" name="wine_id" value="{{ price.wine.id }}">
+                                <input class="price-field" name="price" type="text" value="{{ price.price }}">
+                                <button type="submit">Save</button>
+                            </form>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
